@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Data Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Medical Data Analysis Dashboard</h1>
+        
+        <!-- Data Input Section -->
+        <div class="card mt-4">
+            <div class="card-header">Input Medical Data</div>
+            <div class="card-body">
+                <form id="dataForm">
+                    <div class="mb-3">
+                        <label for="disease" class="form-label">Disease Name:</label>
+                        <input type="text" class="form-control" id="disease" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="risk" class="form-label">Risk Level (1-100):</label>
+                        <input type="number" class="form-control" id="risk" min="1" max="100" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Data</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Risk Analysis Table -->
+        <div class="card mt-4">
+            <div class="card-header">Risk Analysis</div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Disease</th>
+                            <th>Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                        <tr><td colspan="2" class="text-center">No Data Available</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Visualization Section -->
+        <div class="card mt-4">
+            <div class="card-header">Medical Data Visualization</div>
+            <div class="card-body">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let diseaseData = [];
+        const ctx = document.getElementById('riskChart').getContext('2d');
+        let riskChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Risk Level',
+                    data: [],
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            }
+        });
+        
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let disease = document.getElementById('disease').value;
+            let risk = document.getElementById('risk').value;
+            diseaseData.push({ disease, risk });
+            updateTable();
+            updateChart();
+        });
+        
+        function updateTable() {
+            let tableBody = document.getElementById('dataTable');
+            tableBody.innerHTML = '';
+            diseaseData.forEach((data) => {
+                let row = `<tr><td>${data.disease}</td><td>${data.risk}%</td></tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+        
+        function updateChart() {
+            riskChart.data.labels = diseaseData.map(d => d.disease);
+            riskChart.data.datasets[0].data = diseaseData.map(d => d.risk);
+            riskChart.update();
+        }
+    </script>
+</body>
+</html>
